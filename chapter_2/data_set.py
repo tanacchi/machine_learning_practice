@@ -11,8 +11,9 @@ mglearn.discrete_scatter(X[:, 0], X[:, 1], y)
 plt.legend(["Class 0", "Class 1"], loc=4)
 plt.xlabel("First feature")
 plt.ylabel("Second feature")
-print("X.shape: {}".format(X.shape))  # X.shape: (26, 2)
-plt.show()
+# print("X.shape: {}".format(X.shape))  # X.shape: (26, 2)
+if __name__ == "__main__":
+  plt.show() 
 
 
 X, y = mglearn.datasets.make_wave(n_samples=40)
@@ -20,13 +21,14 @@ plt.plot(X, y, 'o')
 plt.ylim(-3, 3)
 plt.xlabel("Feature") # 特徴量
 plt.ylabel("Target")
-plt.show()
+if __name__ == "__main__":
+  plt.show()
 
 
 from sklearn.datasets import load_breast_cancer
 
 cancer = load_breast_cancer()
-print("cancer.keys():\n{}".format(cancer.keys()))
+# print("cancer.keys():\n{}".format(cancer.keys()))
 
 """
 cancer.keys():
@@ -35,16 +37,16 @@ dict_keys(['target_names', 'target', 'filename', 'feature_names', 'DESCR', 'data
 """
 
 
-print("Shape of cancer data: {}".format(cancer.data.shape))
+# print("Shape of cancer data: {}".format(cancer.data.shape))
 
 """
 Shape of cancer data: (569, 30)
 
 """
 
-print("Sample counts per class:\n{}".format(
-  {n: v for n, v in zip(cancer.target_names, np.bincount(cancer.target))}
-))
+# print("Sample counts per class:\n{}".format(
+#   {n: v for n, v in zip(cancer.target_names, np.bincount(cancer.target))}
+# ))
 
 """
 Sample counts per class:
@@ -52,7 +54,7 @@ Sample counts per class:
 
 """
 
-print("Feature names:\n{}".format(cancer.feature_names))
+# print("Feature names:\n{}".format(cancer.feature_names))
 
 """
 Feature names:
@@ -71,7 +73,7 @@ Feature names:
 from sklearn.datasets import load_boston
 
 boston = load_boston()
-print("Data shape: {}".format(boston.data.shape))
+# print("Data shape: {}".format(boston.data.shape))
 
 """
 Data shape: (506, 13)
@@ -79,7 +81,7 @@ Data shape: (506, 13)
 """
 
 X, y = mglearn.datasets.load_extended_boston()
-print("X.shape: {}".format(X.shape))
+# print("X.shape: {}".format(X.shape))
 
 """
 X.shape: (506, 104)
