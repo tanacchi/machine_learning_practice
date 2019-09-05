@@ -11,9 +11,9 @@ def digitize_state(observation):
     cart_pos, cart_v, pole_angle, pole_v = observation
     digitized = [
         np.digitize(cart_pos,   bins=discretize(-2.4, 2.4, num_digitized)),
-        np.digitize(cart_v,     bins=discretize(-2.4, 2.4, num_digitized)),
-        np.digitize(pole_angle, bins=discretize(-2.4, 2.4, num_digitized)),
-        np.digitize(pole_v,     bins=discretize(-2.4, 2.4, num_digitized))
+        np.digitize(cart_v,     bins=discretize(-3.0, 3.0, num_digitized)),
+        np.digitize(pole_angle, bins=discretize(-0.5, 0.5, num_digitized)),
+        np.digitize(pole_v,     bins=discretize(-2.0, 2.0, num_digitized))
     ]
     return sum([x * (num_digitized**i) for i, x in enumerate(digitized)])
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         episode_reward = 0
 
         for t in range(max_steps):
-            if is_learned:
+            if episode % 100 == 0:
                 env.render()
                 time.sleep(0.001)
                 print("[{}]\t=>{}:\t{}".format(episode, t, observation))
@@ -64,7 +64,7 @@ if __name__ == '__main__':
                 if t < 195:
                     reward = -200
                 else:
-                    reward = 1
+                    reward = 5 - abs(observation[0])*2
             else:
                 reward = 1
 
@@ -89,4 +89,4 @@ if __name__ == '__main__':
                     is_render = True
 
     if is_learned:
-        np.savetxt('final_x.csv', final_x, delmiter=',')
+        np.savetxt('final_x.csv', final_x, delimiter=',')
