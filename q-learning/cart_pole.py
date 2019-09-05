@@ -40,7 +40,7 @@ if __name__ == '__main__':
     iterations          = 100
     episodes            = 2000
     goal_avarage_reward = 195
-    num_digitized       = 6
+    num_digitized       = 8
     q_table = np.random.uniform(low=-1, high=1, size=(num_digitized**4, env.action_space.n))
     total_reward_vec      = np.zeros(iterations)
     final_x               = np.zeros((episodes, 1))
@@ -55,8 +55,8 @@ if __name__ == '__main__':
         for t in range(max_steps):
             if is_learned:
                 env.render()
-                time.sleep(0.1)
-                print(observation)
+                time.sleep(0.001)
+                print("[{}]\t=>{}:\t{}".format(episode, t, observation))
 
             observation, reward, done, info = env.step(action)
 
