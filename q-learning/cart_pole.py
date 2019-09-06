@@ -87,6 +87,4 @@ if __name__ == '__main__':
                 is_learned = True
                 if is_render == False:
                     is_render = True
-
-    if is_learned:
-        np.savetxt('final_x.csv', final_x, delimiter=',')
+    env.close()
