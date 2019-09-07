@@ -55,7 +55,7 @@ if __name__ == '__main__':
         for t in range(max_steps):
             if episode % 100 == 0:
                 env.render()
-                time.sleep(0.001)
+                time.sleep(0.05)
                 print("[{}]\t=>{}:\t{}".format(episode, t, observation))
 
             observation, reward, done, info = env.step(action)
@@ -87,4 +87,4 @@ if __name__ == '__main__':
                 is_learned = True
                 if is_render == False:
                     is_render = True
-    env.close()
+        env.close()
