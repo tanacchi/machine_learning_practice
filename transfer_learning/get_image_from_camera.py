@@ -3,9 +3,30 @@ import matplotlib.pyplot as plt
 import time
 import os
 import curses
+import argparse
+
+def make_key_class_table():
+    def config_argparser():
+        import string
+        parser = argparse.ArgumentParser()
+        for c in string.ascii_lowercase:
+            if c != 'h':
+                parser.add_argument('-' + c, help="key of class {}".format(c.upper()))
+        return parser
+
+    parser = config_argparser()
+    args = parser.parse_args()
+    args = vars(args)
+    return { key : class_name for key, class_name in args.items() if class_name is not None }
+
+
+key_class_table = make_key_class_table()
+print(key_class_table)
+
+if key_class_table == {}:
+    raise ValueError("More than 0 key & class_name are required.")
 
 time_str = time.strftime("%YY_%mM_%dd_%Hh_%Mm_%Ss")
-key_class_table = { 'p' : 'piece', 'f' : 'xxx', 'g': 'good'}
 class_num_table = { key : 0 for key in key_class_table.values()}
 
 images_root_dir = "./data/" + time_str + "/"
@@ -38,13 +59,15 @@ try:
             continue
 
         image_class = key_class_table[key]
-        stdscr.clear()
         image_count = class_num_table[image_class]
         class_num_table[image_class] += 1
+        total_count += 1
+
+        stdscr.clear()
         display_str = "[total:{}][class:{}] {} will be saved.".format(total_count, image_count, image_class)
         stdscr.addstr(0, 0, display_str)
-        total_count += 1
-        filename = images_root_dir + image_class + "/" + str(image_count) + ".jpg"
+
+        filename = images_root_dir + image_class + "/" + str(image_count).zfill(8) + ".jpg"
         cv2.imwrite(filename, frame)
 
     curses.endwin()
