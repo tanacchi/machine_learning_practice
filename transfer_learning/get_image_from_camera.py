@@ -5,6 +5,7 @@ import os
 import curses
 import argparse
 
+
 def make_key_class_table():
     def config_argparser():
         import string
@@ -24,6 +25,24 @@ def make_image_dirs(root_dir_path, class_names):
         new_dir_path = root_dir_path + "/" + new_dir_name
         os.makedirs(new_dir_path)
 
+
+def show_progress(key_class_table, class_num_table, window, new_image_class=None):
+    def format_progress_str(key, class_name, class_count, total_count):
+        return "{} => {} (count: {}/{})".format(key, class_name, class_count, total_count)
+
+    keys, names, counts = key_class_table.keys(), key_class_table.values(), class_num_table.values()
+    key_name_count_list = [ (key, name, count) for key, name, count in zip(keys, names, counts) ]
+    total_count = sum(counts)
+    row_max = len(key_name_count_list)
+    window.clear()
+    for i in range(row_max):
+        key, name, count = key_name_count_list[i]
+        display_str = format_progress_str(key, name, count, total_count)
+        window.addstr(i, 0, display_str)
+    if new_image_class:
+        window.addstr(row_max, 0, "{} was saved.".format(new_image_class))
+
+
 def main(camera, stdscr):
     key_class_table = make_key_class_table()
     class_num_table = { key : 0 for key in key_class_table.values()}
@@ -35,7 +54,7 @@ def main(camera, stdscr):
     images_root_dir = "./data/" + time.strftime("%YY_%mM_%dd_%Hh_%Mm_%Ss")
     make_image_dirs(root_dir_path=images_root_dir, class_names=key_class_table.values())
 
-    total_count = 0
+    show_progress(key_class_table, class_num_table, stdscr)
     while True:
         grab, frame = camera.read()
         rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -52,14 +71,11 @@ def main(camera, stdscr):
         image_class = key_class_table[key]
         image_count = class_num_table[image_class]
         class_num_table[image_class] += 1
-        total_count += 1
-
-        stdscr.clear()
-        display_str = "[total:{}][class:{}] {} will be saved.".format(total_count, image_count, image_class)
-        stdscr.addstr(0, 0, display_str)
 
         filename = "{}/{}/{}.jpg".format(images_root_dir, image_class, str(image_count).zfill(8))
         cv2.imwrite(filename, frame)
+        show_progress(key_class_table, class_num_table, stdscr, image_class)
+        camera.grab()
 
 
 if __name__ == '__main__':
