@@ -9,9 +9,8 @@ def make_key_class_table():
     def config_argparser():
         import string
         parser = argparse.ArgumentParser()
-        for c in string.ascii_lowercase:
-            if c != 'h':
-                parser.add_argument('-' + c, help="key of class {}".format(c.upper()))
+        for c in [ char for char in string.ascii_lowercase if char != 'h' ]:
+            parser.add_argument('-' + c, help="key of class {}".format(c.upper()))
         return parser
 
     parser = config_argparser()
@@ -20,31 +19,23 @@ def make_key_class_table():
     return { key : class_name for key, class_name in args.items() if class_name is not None }
 
 
-key_class_table = make_key_class_table()
-print(key_class_table)
+def make_image_dirs(root_dir_path, class_names):
+    for new_dir_name in class_names:
+        new_dir_path = root_dir_path + "/" + new_dir_name
+        os.makedirs(new_dir_path)
 
-if key_class_table == {}:
-    raise ValueError("More than 0 key & class_name are required.")
+def main(camera, stdscr):
+    key_class_table = make_key_class_table()
+    class_num_table = { key : 0 for key in key_class_table.values()}
+    print(key_class_table)
 
-time_str = time.strftime("%YY_%mM_%dd_%Hh_%Mm_%Ss")
-class_num_table = { key : 0 for key in key_class_table.values()}
+    if key_class_table == {}:
+        raise ValueError("More than 0 key & class_name are required.")
 
-images_root_dir = "./data/" + time_str + "/"
-for new_dir_name in key_class_table.values():
-    new_dir_path = images_root_dir + new_dir_name + "/"
-    os.makedirs(new_dir_path)
+    images_root_dir = "./data/" + time.strftime("%YY_%mM_%dd_%Hh_%Mm_%Ss")
+    make_image_dirs(root_dir_path=images_root_dir, class_names=key_class_table.values())
 
-camera = cv2.VideoCapture(0)
-camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-camera.set(cv2.CAP_PROP_FPS, 1)
-
-plt.ion()
-
-stdscr = curses.initscr()
-curses.noecho()
-
-total_count = 0
-try:
+    total_count = 0
     while True:
         grab, frame = camera.read()
         rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -67,14 +58,22 @@ try:
         display_str = "[total:{}][class:{}] {} will be saved.".format(total_count, image_count, image_class)
         stdscr.addstr(0, 0, display_str)
 
-        filename = images_root_dir + image_class + "/" + str(image_count).zfill(8) + ".jpg"
+        filename = "{}/{}/{}.jpg".format(images_root_dir, image_class, str(image_count).zfill(8))
         cv2.imwrite(filename, frame)
 
-    curses.endwin()
-    camera.release()
-    plt.close()
 
-except KeyboardInterrupt:
-    curses.endwin()
-    camera.release()
-    plt.close()
+if __name__ == '__main__':
+    try:
+        camera = cv2.VideoCapture(0)
+        camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        camera.set(cv2.CAP_PROP_FPS, 1)
+
+        stdscr = curses.initscr()
+        curses.noecho()
+        plt.ion()
+
+        main(camera, stdscr)
+    finally:
+        curses.endwin()
+        camera.release()
+        plt.close()
