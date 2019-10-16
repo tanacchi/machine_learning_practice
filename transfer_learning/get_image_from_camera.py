@@ -75,14 +75,18 @@ def main(camera, stdscr):
         filename = "{}/{}/{}.jpg".format(images_root_dir, image_class, str(image_count).zfill(8))
         cv2.imwrite(filename, frame)
         show_progress(key_class_table, class_num_table, stdscr, image_class)
-        camera.grab()
+
+        # flush captured image buffer
+        skip = sum(class_num_table.values()) // 10
+        for _ in range(skip):
+            camera.grab()
 
 
 if __name__ == '__main__':
     try:
         camera = cv2.VideoCapture(0)
         camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-        camera.set(cv2.CAP_PROP_FPS, 1)
+        camera.set(cv2.CAP_PROP_FPS, 30)
 
         stdscr = curses.initscr()
         curses.noecho()
